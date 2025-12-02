@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+
+{% block main %}
+<h1>{{ group.name }}</h1>
+<p class="text-muted">Created {{ group.created_at.strftime('%B %d, %Y') }}</p>
+
+<div class="row mt-4">
+    <div class="col-md-8">
+        <h3>Expenses</h3>
+        
+        {% if expenses %}
+            <div class="list-group">
+                {% for expense in expenses %}
+                <div class="list-group-item">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5>{{ expense.category }} {{ expense.description }}</h5>
+                            <small>Paid by {{ expense.payer.username }} on {{ expense.created_at.strftime('%b %d') }}</small>
+                        </div>
+                        <div>
+                            <strong>${{ "%.2f"|format(expense.amount) }}</strong>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-muted">No expenses yet. Add your first expense!</p>
+        {% endif %}
+        
+        <a href="/group/{{ group.id }}/add-expense" class="btn btn-success mt-3">➕ Add Expense</a>
+    </div>
+    
+    <div class="col-md-4">
+        <h4>Members</h4>
+        <ul class="list-group">
+            {% for member in members %}
+            <li class="list-group-item">{{ member.user.username }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

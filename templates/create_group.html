@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+
+{% block main %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <h2>Create New Group</h2>
+        <form method="post">
+            <div class="mb-3">
+                <label class="form-label">Group Name</label>
+                <input type="text" name="name" class="form-control" placeholder="Vegas Trip 🎰" required>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">Theme</label>
+                <select name="theme" class="form-select">
+                    <option value="default">🎉 Default</option>
+                    <option value="beach">🏖️ Beach Trip</option>
+                    <option value="food">🍕 Food Adventures</option>
+                    <option value="travel">✈️ Travel</option>
+                    <option value="party">🎊 Party</option>
+                </select>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Create Group</button>
+            <a href="/" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}
