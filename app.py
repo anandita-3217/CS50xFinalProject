@@ -78,71 +78,6 @@ Session(app)
 # Configure SQLAlchemy
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///expenses.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-db = SQLAlchemy(app)
-
-# Models
-class User(db.Model):
-    __tablename__ = 'users'
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
-    hash = db.Column(db.String(200), nullable=False)
-    
-    # Relationships
-    paid_expenses = db.relationship('Expense', backref='payer', lazy=True)
-    debts_owed = db.relationship('Debt', foreign_keys='Debt.debtor_id', backref='debtor', lazy=True)
-    debts_owed_to_me = db.relationship('Debt', foreign_keys='Debt.creditor_id', backref='creditor', lazy=True)
-
-class Group(db.Model):
-    __tablename__ = 'groups'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    theme = db.Column(db.String(50))
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
-    # Relationships
-    expenses = db.relationship('Expense', backref='group', lazy=True)
-    members = db.relationship('GroupMember', backref='group', lazy=True)
-
-class GroupMember(db.Model):
-    __tablename__ = 'group_members'
-    id = db.Column(db.Integer, primary_key=True)
-    group_id = db.Column(db.Integer, db.ForeignKey('groups.id'), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    
-    # Relationship to User
-    user = db.relationship('User', backref='group_memberships')
-
-class Expense(db.Model):
-    __tablename__ = 'expenses'
-    id = db.Column(db.Integer, primary_key=True)
-    group_id = db.Column(db.Integer, db.ForeignKey('groups.id'), nullable=False)
-    paid_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    amount = db.Column(db.Float, nullable=False)
-    description = db.Column(db.String(200), nullable=False)
-    category = db.Column(db.String(50))  # emoji category
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
-    # Relationships
-    debts = db.relationship('Debt', backref='expense', lazy=True)
-
-class Debt(db.Model):
-    __tablename__ = 'debts'
-    id = db.Column(db.Integer, primary_key=True)
-    expense_id = db.Column(db.Integer, db.ForeignKey('expenses.id'), nullable=False)
-    debtor_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    creditor_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    amount = db.Column(db.Float, nullable=False)
-    paid = db.Column(db.Boolean, default=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    paid_at = db.Column(db.DateTime, nullable=True)
-
-# Initialize database
-def init_db():
-    with app.app_context():
-        db.create_all()
-        print("Database initialized successfully!")
-
-# Routes
 @app.route("/")
 def index():
     if "user_id" not in session:
@@ -209,55 +144,6 @@ def logout():
     session.clear()
     return redirect("/")
 
-@app.route("/create-group", methods=["GET", "POST"])
-def create_group():
-    if "user_id" not in session:
-        return redirect("/login")
-    
-    if request.method == "POST":
-        name = request.form.get("name")
-        theme = request.form.get("theme", "default")
-        
-        if not name:
-            return "Group name required", 400
-        
-        # Create group
-        new_group = Group(name=name, theme=theme)
-        db.session.add(new_group)
-        db.session.commit()
-        
-        # Add creator as member
-        membership = GroupMember(group_id=new_group.id, user_id=session["user_id"])
-        db.session.add(membership)
-        db.session.commit()
-        
-        return redirect(f"/group/{new_group.id}")
-    
-    return render_template("create_group.html")
-
-@app.route("/group/<int:group_id>")
-def view_group(group_id):
-    if "user_id" not in session:
-        return redirect("/login")
-    
-    group = Group.query.get_or_404(group_id)
-    
-    # Check if user is member
-    is_member = GroupMember.query.filter_by(
-        group_id=group_id, 
-        user_id=session["user_id"]
-    ).first()
-    
-    if not is_member:
-        return "You are not a member of this group", 403
-    
-    # Get expenses
-    expenses = Expense.query.filter_by(group_id=group_id).order_by(Expense.created_at.desc()).all()
-    
-    # Get members
-    members = GroupMember.query.filter_by(group_id=group_id).all()
-    
-    return render_template("group.html", group=group, expenses=expenses, members=members)
 
 if __name__ == "__main__":
     app.run(debug=True)
