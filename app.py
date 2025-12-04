@@ -1,72 +1,10 @@
-# from flask import Flask
-# from flask import Flask, flash, redirect, render_template, request, session
-# from flask_session import Session
-# from flask_sqlalchemy import SQLAlchemy
-# from werkzeug.security import check_password_hash, generate_password_hash
-
-# from helpers import apology, login_required, lookup, usd
-# app = Flask(__name__)
-# db = SQLAlchemy("sqlite:///finance.db")
-
-# @app.route("/")
-# def home():
-#     return render_template("index.html")
-
-# @app.route("/login", methods=["GET", "POST"])
-# def login():
-#     """Log user in"""
-
-#     # Forget any user_id
-#     session.clear()
-
-#     # User reached route via POST (as by submitting a form via POST)
-#     if request.method == "POST":
-#         # Ensure username was submitted
-#         if not request.form.get("username"):
-#             return apology("must provide username", 403)
-
-#         # Ensure password was submitted
-#         elif not request.form.get("password"):
-#             return apology("must provide password", 403)
-
-#         # Query database for username
-#         rows = db.execute(
-#             "SELECT * FROM users WHERE username = ?", request.form.get("username")
-#         )
-
-#         # Ensure username exists and password is correct
-#         if len(rows) != 1 or not check_password_hash(
-#             rows[0]["hash"], request.form.get("password")
-#         ):
-#             return apology("invalid username and/or password", 403)
-
-#         # Remember which user has logged in
-#         session["user_id"] = rows[0]["id"]
-
-#         # Redirect user to home page
-#         return redirect("/")
-
-#     # User reached route via GET (as by clicking a link or via redirect)
-#     else:
-#         return render_template("login.html")
-
-
-# @app.route("/logout")
-# def logout():
-#     """Log user out"""
-
-#     # Forget any user_id
-#     session.clear()
-
-#     # Redirect user to login form
-#     return redirect("/")
-
-
 from flask import Flask, render_template, request, session, redirect, url_for
 from flask_session import Session
-from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import check_password_hash, generate_password_hash
 from datetime import datetime
+
+# Import db and models from models.py
+from models import db, User, Group, GroupMember, Expense, Debt
 
 app = Flask(__name__)
 
@@ -78,17 +16,22 @@ Session(app)
 # Configure SQLAlchemy
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///expenses.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+# Initialize db with app
+db.init_app(app)
+
+# Routes
 @app.route("/")
 def index():
     if "user_id" not in session:
         return redirect("/login")
     
     # Get user's groups
-    user = User.query.get(session["user_id"])
-    memberships = GroupMember.query.filter_by(user_id=user.id).all()
+    memberships = GroupMember.query.filter_by(user_id=session["user_id"]).all()
     groups = [m.group for m in memberships]
     
     return render_template("index.html", groups=groups)
+
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -120,6 +63,7 @@ def register():
     
     return render_template("register.html")
 
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     session.clear()
@@ -139,10 +83,63 @@ def login():
     
     return render_template("login.html")
 
+
 @app.route("/logout")
 def logout():
     session.clear()
     return redirect("/")
+
+
+@app.route("/create-group", methods=["GET", "POST"])
+def create_group():
+    if "user_id" not in session:
+        return redirect("/login")
+    
+    if request.method == "POST":
+        name = request.form.get("name")
+        theme = request.form.get("theme", "default")
+        
+        if not name:
+            return "Group name required", 400
+        
+        # Create group
+        new_group = Group(name=name, theme=theme)
+        db.session.add(new_group)
+        db.session.commit()
+        
+        # Add creator as member
+        membership = GroupMember(group_id=new_group.id, user_id=session["user_id"])
+        db.session.add(membership)
+        db.session.commit()
+        
+        return redirect(f"/group/{new_group.id}")
+    
+    return render_template("create_group.html")
+
+
+@app.route("/group/<int:group_id>")
+def view_group(group_id):
+    if "user_id" not in session:
+        return redirect("/login")
+    
+    group = Group.query.get_or_404(group_id)
+    
+    # Check if user is member
+    is_member = GroupMember.query.filter_by(
+        group_id=group_id, 
+        user_id=session["user_id"]
+    ).first()
+    
+    if not is_member:
+        return "You are not a member of this group", 403
+    
+    # Get expenses
+    expenses = Expense.query.filter_by(group_id=group_id).order_by(Expense.created_at.desc()).all()
+    
+    # Get members
+    members = GroupMember.query.filter_by(group_id=group_id).all()
+    
+    return render_template("group.html", group=group, expenses=expenses, members=members)
 
 
 if __name__ == "__main__":

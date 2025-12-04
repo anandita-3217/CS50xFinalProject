@@ -1,21 +1,8 @@
-from  flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-db =SQLAlchemy()
-class User:
-    __tablename__ = 'users'
-    id = db.Column(db.Integer, primary_key = True)
-    username = db.Column(db.String(80),unique= True,nullable=False)
-    hash = db.Column(db.String(200), nullable =False)
-    paid_expenses = db.relationship('Expense', backref='payer', lazy=True)
-    debts_owed = db.relationship('Debt', foreign_keys='Debt.debtor_id', backref='debtor', lazy=True)
-    debts_owed_to_me = db.relationship('Debt', foreign_keys='Debt.creditor_id', backref='creditor', lazy=True)
 
-    def __repr__(self):
-        return f'<User {self.username}>'
+db = SQLAlchemy()
 
-db = SQLAlchemy(app)
-
-# Models
 class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -26,6 +13,10 @@ class User(db.Model):
     paid_expenses = db.relationship('Expense', backref='payer', lazy=True)
     debts_owed = db.relationship('Debt', foreign_keys='Debt.debtor_id', backref='debtor', lazy=True)
     debts_owed_to_me = db.relationship('Debt', foreign_keys='Debt.creditor_id', backref='creditor', lazy=True)
+
+    def __repr__(self):
+        return f'<User {self.username}>'
+
 
 class Group(db.Model):
     __tablename__ = 'groups'
@@ -38,6 +29,10 @@ class Group(db.Model):
     expenses = db.relationship('Expense', backref='group', lazy=True)
     members = db.relationship('GroupMember', backref='group', lazy=True)
 
+    def __repr__(self):
+        return f'<Group {self.name}>'
+
+
 class GroupMember(db.Model):
     __tablename__ = 'group_members'
     id = db.Column(db.Integer, primary_key=True)
@@ -47,6 +42,10 @@ class GroupMember(db.Model):
     # Relationship to User
     user = db.relationship('User', backref='group_memberships')
 
+    def __repr__(self):
+        return f'<GroupMember user_id={self.user_id} group_id={self.group_id}>'
+
+
 class Expense(db.Model):
     __tablename__ = 'expenses'
     id = db.Column(db.Integer, primary_key=True)
@@ -54,11 +53,15 @@ class Expense(db.Model):
     paid_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     amount = db.Column(db.Float, nullable=False)
     description = db.Column(db.String(200), nullable=False)
-    category = db.Column(db.String(50))  # emoji category
+    category = db.Column(db.String(50))  # 🍔 🚕 🎉 etc.
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     # Relationships
     debts = db.relationship('Debt', backref='expense', lazy=True)
+
+    def __repr__(self):
+        return f'<Expense {self.description} ${self.amount}>'
+
 
 class Debt(db.Model):
     __tablename__ = 'debts'
@@ -71,10 +74,5 @@ class Debt(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     paid_at = db.Column(db.DateTime, nullable=True)
 
-# Initialize database
-def init_db():
-    with app.app_context():
-        db.create_all()
-        print("Database initialized successfully!")
-
-# Routes
+    def __repr__(self):
+        return f'<Debt ${self.amount} paid={self.paid}>'
