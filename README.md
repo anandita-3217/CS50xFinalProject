@@ -63,3 +63,14 @@ The application uses Flask-Session for user authentication, ensuring that each u
 - Recurring expense tracking (nice-to-have but not essential)
 
 This project taught me the importance of scope management - I had many ambitious ideas but learned to focus on core features that could be completed within the deadline while still delivering a polished, functional, and genuinely useful application.
+
+#### **Technologies used**
+- Languages:
+    - Python 
+    - HTML
+    - SQL
+- Frameworks:
+    - Flask (Backend)
+    - Bootstrap (UI)
+- Database:
+    - Sqllite

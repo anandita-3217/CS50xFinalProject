@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Add Member
+{% endblock %}
+
+{% block main %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <h2 class="mb-4">Add Member to {{ group.name }}</h2>
+
+        {% if available_users %}
+        <form action="/group/{{ group_id }}/add-member" method="post">
+            <div class="mb-3">
+                <label for="username" class="form-label">Select User</label>
+                <select class="form-select" name="username" required>
+                    <option value="">Choose a user...</option>
+                    {% for user in available_users %}
+                    <option value="{{ user.username }}">{{ user.username }}</option>
+                    {% endfor %}
+                </select>
+                <div class="form-text">Only registered users can be added to groups.</div>
+            </div>
+
+            <button class="btn btn-primary w-100" type="submit"><i class="bi bi-plus"></i>Add Member</button>
+            <a href="/group/{{ group_id }}" class="btn btn-outline-secondary w-100 mt-2">Cancel</a>
+        </form>
+        {% else %}
+        <div class="alert alert-info">
+            All registered users are already members of this group!
+        </div>
+        <a href="/group/{{ group_id }}" class="btn btn-outline-secondary">← Back to Group</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

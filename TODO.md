@@ -4,22 +4,22 @@
 
 ### Day 1: Foundation & Core Logic
 - [X] Set up Flask app structure
-- [ ] Create database schema (users, groups, expenses, debts, payments)
+- [X] Create database schema (users, groups, expenses, debts, payments)
 - [X] Implement user registration/login
-- [ ] Build expense splitting logic (equal split)
-- [ ] Calculate who owes whom (minimize transactions algorithm)
-- [ ] Basic routes: create group, add expense, view debts
+- [X] Build expense splitting logic (equal split)
+- [X] Calculate who owes whom (minimize transactions algorithm)
+- [X] Basic routes: create group, add expense, view debts
 - [ ] Test calculations with dummy data
 
 ### Day 2: UI/UX & Making It Pretty
-- [ ] Set up Bootstrap/Tailwind CSS
-- [ ] Design group dashboard page
-- [ ] Create expense list with emoji categories
-- [ ] Build add expense form with emoji selector
-- [ ] Group creation page with themes
-- [ ] Add "mark as paid" button
+- [X] Set up Bootstrap/Tailwind CSS
+- [X] Design group dashboard page
+- [X] Create expense list with emoji categories
+- [X] Build add expense form with emoji selector
+- [X] Group creation page with themes
+- [X] Add "mark as paid" button
 - [ ] Implement confetti animation on payment
-- [ ] Color coding for debts (green = owed to you, red = you owe)
+- [X] Color coding for debts (green = owed to you, red = you owe)
 - [ ] Hover effects and transitions
 
 ### Day 3: Fun Features & Reminders
@@ -40,11 +40,11 @@
 - [ ] Loading states and error messages
 - [ ] Final UI polish
 - [ ] Write full README.md (750+ words)
-  - [ ] Project description
-  - [ ] File structure explanation
-  - [ ] Design choices
-  - [ ] How to run locally
-  - [ ] Technologies used
+  - [X] Project description
+  - [X] File structure explanation
+  - [X] Design choices
+  - [X] How to run locally
+  - [X] Technologies used
 
 ### Day 5: Video Production
 - [ ] Script preparation

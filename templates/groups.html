@@ -1,0 +1,42 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+    My Groups
+{% endblock %}
+
+{% block main %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <h2 class="mb-4">My Groups</h2>
+        {% if groups %}
+        <div class="row">
+            {% for group in groups %}
+                <div class="col-md-4 mb-4">
+                    <a href="/group/{{ group.id }}" class="text-decoration-none text-dark">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-header text-white bg-primary">
+                                <h5 class="card-title">{{ group.name }}</h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text">
+                                    <strong>Theme:</strong> {{ group.theme }}<br>
+                                    <strong>Created:</strong> {{ group.created_at }}
+                                </p>
+                            </div>
+                            <div class="card-footer bg-primary text-white d-flex justify-content-between">
+                                <a href="/group/{{ group.id }}/add-member" class="btn btn-sm btn-outline-light"><i class="bi bi-person-plus"></i> Add Member</a>
+                                <a href="/group/{{ group.id }}/add-expense" class="btn btn-sm btn-outline-dark"><bi class="bi bi-plus"></bi> Add Expense</a>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="alert alert-info" role="alert">
+            No Groups for now!
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

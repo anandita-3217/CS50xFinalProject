@@ -1,43 +1,78 @@
-{% extends "layout.html" %}
+{% extends 'layout.html' %}
+{% block title %}
+    GROUP {{ group.name}}
+{% endblock %}
 
 {% block main %}
-<h1>{{ group.name }}</h1>
-<p class="text-muted">Created {{ group.created_at.strftime('%B %d, %Y') }}</p>
-
-<div class="row mt-4">
+<div class="row justify-content-center">
     <div class="col-md-8">
-        <h3>Expenses</h3>
-        
-        {% if expenses %}
-            <div class="list-group">
-                {% for expense in expenses %}
-                <div class="list-group-item">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h5>{{ expense.category }} {{ expense.description }}</h5>
-                            <small>Paid by {{ expense.payer.username }} on {{ expense.created_at.strftime('%b %d') }}</small>
-                        </div>
-                        <div>
-                            <strong>${{ "%.2f"|format(expense.amount) }}</strong>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <p class="text-muted">No expenses yet. Add your first expense!</p>
-        {% endif %}
-        
-        <a href="/group/{{ group.id }}/add-expense" class="btn btn-success mt-3">➕ Add Expense</a>
-    </div>
-    
-    <div class="col-md-4">
-        <h4>Members</h4>
-        <ul class="list-group">
-            {% for member in members %}
-            <li class="list-group-item">{{ member.user.username }}</li>
-            {% endfor %}
+        <h2 class="mb-4">{{ group.name }}</h2>
+        <ul class="nav nav-tabs" id="groupTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="details-tab" data-bs-toggle="tab" data-bs-target="#details" type="button">
+                    Details
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="members-tab" data-bs-toggle="tab" data-bs-target="#members" type="button">
+                    Members
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="expenses-tab" data-bs-toggle="tab" data-bs-target="#expenses" type="button">
+                    Expenses
+                </button>
+            </li>
         </ul>
+        <div class="tab-content mt-3">
+            <div class="tab-pane fade show active" id="details" role="tabpanel">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4>Details</h4>
+                </div>
+                <p><strong>Name: </strong> {{ group.name }}</p>
+                <p><strong>Category: </strong> {{ group.theme }}</p>
+                <p><strong>Created: </strong> {{ group.created_at }}</p>
+            </div>
+
+            <div class="tab-pane fade" id="members" role="tabpanel">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4>Members ({{ members|length }})</h4>
+                    <a href="/group/{{ group.id }}/add-member" class="btn btn-sm btn-primary"><bi class="bi bi-plus"></bi> Add Member</a>
+                </div>
+                <ul class="list-group">
+                    {% for member in members %}
+                    <li class="list-group-item"><i class="bi bi-person"></i> {{ member.username }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="tab-pane fade" id="expenses" role="tabpanel">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4>Expenses ({{ expenses|length }})</h4>
+                    <a href="/group/{{ group.id }}/add-expense" class="btn btn-sm btn-primary"><bi class="bi bi-plus"></bi> Add Expense</a>
+                </div>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Description</th>
+                            <th>Payer</th>
+                            <th>Amount</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for e in expenses %}
+                        <tr>
+                            <td>{{ e.description }}</td>
+                            <td>{{ e.payer_name }}</td>
+                            <td>${{ "%.2f"|format(e.amount) }}</td>
+                            <td>{{ e.created_at }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
     </div>
 </div>
 {% endblock %}

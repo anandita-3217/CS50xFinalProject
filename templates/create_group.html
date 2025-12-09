@@ -1,28 +1,38 @@
 {% extends "layout.html" %}
 
+{% block title %}
+    Create Group
+{% endblock %}
+
 {% block main %}
 <div class="row justify-content-center">
     <div class="col-md-6">
-        <h2>Create New Group</h2>
-        <form method="post">
+        <h2 class="mb-4">Create New Group</h2>
+        <form action="/create-group" method="post">
             <div class="mb-3">
-                <label class="form-label">Group Name</label>
-                <input type="text" name="name" class="form-control" placeholder="Vegas Trip 🎰" required>
+                <label for="name" class="form-label">Group Name</label>
+                <input autocomplete="off" autofocus class="form-control" name="name"
+                       placeholder="e.g., Vegas Weekend, Roommate Expenses" type="text" required>
             </div>
-            
+
             <div class="mb-3">
-                <label class="form-label">Theme</label>
-                <select name="theme" class="form-select">
-                    <option value="default">🎉 Default</option>
-                    <option value="beach">🏖️ Beach Trip</option>
-                    <option value="food">🍕 Food Adventures</option>
-                    <option value="travel">✈️ Travel</option>
-                    <option value="party">🎊 Party</option>
+                <label for="theme" class="form-label">Choose a Theme</label>
+                <select class="form-select" name="theme">
+                    <option value="💰">💰 Default</option>
+                    <option value="🍔">🍔 Food</option>
+                    <option value="🚕">🚕 Transport</option>
+                    <option value="🎉">🎉 Fun</option>
+                    <option value="🏨">🏨 Lodging</option>
+                    <option value="🛒">🛒 Shopping</option>
+                    <option value="💊">💊 Health</option>
+                    <option value="✈️">✈️ Travel</option>
+                    <option value="☕">☕ Coffee</option>
+                    <option value="🎬">🎬 Entertainment</option>
                 </select>
             </div>
-            
-            <button type="submit" class="btn btn-primary">Create Group</button>
-            <a href="/" class="btn btn-secondary">Cancel</a>
+
+            <button class="btn btn-primary w-100" type="submit">Create Group</button>
+            <a href="/" class="btn btn-outline-secondary w-100 mt-2">Cancel</a>
         </form>
     </div>
 </div>
