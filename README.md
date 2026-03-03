@@ -4,7 +4,7 @@
 
 #### Description:
 
-TODO
+TODO: add design patterns 
 
 This project is a web-based expense splitting application built with Flask that helps groups of friends manage shared expenses and settle debts in a fun and engaging way. Unlike traditional expense trackers that can feel tedious and guilt-inducing, this application gamifies the experience with friendly reminders, celebratory animations, and entertaining visualizations.
 
